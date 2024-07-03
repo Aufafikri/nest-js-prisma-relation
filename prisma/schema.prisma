@@ -1,0 +1,68 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id String @id @default(uuid())
+  email String @unique
+  name String?
+  Post Post[]
+  UserPost UserPost[]
+}
+
+model Post {
+  id String @id @default(uuid())
+  title String
+  description String?
+  userId String
+  User User @relation(fields: [userId], references: [id])
+  UserPost UserPost[]
+}
+
+model UserPost {
+  userId String
+  postId String
+  User User @relation(fields: [userId], references: [id])
+  Post Post @relation(fields: [postId], references: [id])
+
+  @@id([userId, postId])
+}
+
+model Product {
+  id String @id @default(cuid())
+  name String
+  price Int
+  description String?
+  Category Category[]
+  ProductCategory ProductCategory[]
+}
+
+model Category {
+  id String @id @default(cuid())
+  name String
+  productId String
+  Product Product @relation(fields: [productId], references: [id])
+  ProductCategory ProductCategory[]
+}
+
+model ProductCategory {
+  id String @id @default(cuid())
+  productId String
+  categoryId String
+  Product Product @relation(fields: [productId], references: [id])
+  Category Category @relation(fields: [categoryId], references: [id])
+
+  @@unique([productId, categoryId])
+}
+
